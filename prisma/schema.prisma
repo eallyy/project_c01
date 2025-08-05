@@ -1,0 +1,24 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  permissions Permission[] @relation("UserPermissions")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Permission {
+  id Int @id @default(autoincrement())
+  code String @unique // e.g. VIEW_DASHBOARD, EDIT_USER, DELETE_USER
+  users User[] @relation("UserPermissions")
+}
