@@ -1,4 +1,5 @@
 "use client"
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -32,6 +33,8 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const t = useTranslations("login");
+  const t_err = useTranslations("errors");
   const router = useRouter(); 
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -56,7 +59,7 @@ export function LoginForm({
 
       if (!res.ok) {
         // Show API error via form
-        form.setError("email", { type: "manual", message: data.code || "LOGIN_FAILED" });
+        form.setError("email", { type: "manual", message: t_err("LOGIN_FAILED") });
         return;
       }
 
@@ -64,7 +67,7 @@ export function LoginForm({
       router.push("/");
     } catch (error) {
       console.error("Login error:", error);
-      form.setError("email", { type: "manual", message: "SERVER_ERROR" });
+      form.setError("email", { type: "manual", message: t_err("SERVER_ERROR") });
     }
   }
 
@@ -72,34 +75,29 @@ export function LoginForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle>Login to your account</CardTitle>
-          <CardDescription>
-            Enter your email below to login to your account
-          </CardDescription>
+          <CardTitle>{t("heading_title")}</CardTitle>
+          <CardDescription>{t("heading_desc")}</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)}>
                 <div className="flex flex-col gap-6">
-                {form.formState.errors.root && (
-  <p className="text-sm text-red-500">{form.formState.errors.root.message}</p>
-)}
                   <div className="grid gap-3">
                     <FormField
                       control={form.control}
                       name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Email</FormLabel>
+                          <FormLabel>{t("email_label")}</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
                               type="email"
-                              placeholder="me@example.com"
+                              placeholder={t("email_placeholder")}
                               required
                             />
                           </FormControl>
-                  <FormMessage />
+                          <FormMessage />
                         </FormItem>
                       )}
                     >
@@ -112,12 +110,12 @@ export function LoginForm({
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="flex items-center">
-                            Password
+                            {t("password_label")}
                             <a
                               href="#"
                               className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
                             >
-                              Forgot your password?
+                              {t("forgot_password")}
                             </a>
                           </FormLabel>
                           <FormControl>
@@ -136,7 +134,7 @@ export function LoginForm({
                   </div>
                   <div className="flex flex-col gap-3">
                     <Button type="submit" className="w-full">
-                      Login
+                      {t("submit_button")}
                     </Button>
                   </div>
                 </div>

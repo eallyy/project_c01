@@ -1,0 +1,15 @@
+{
+  "login": {
+    "heading_title": "Login to your account",
+    "heading_desc": "Enter your email below to login to your account",
+    "email_label": "Email",
+    "email_placeholder": "me@example.com",
+    "password_label": "Password",
+    "forgot_password": "Forgot your password?",
+    "submit_button": "Login"
+  },
+  "errors": {
+    "LOGIN_FAILED": "Login failed. Please check your credentials and try again.",
+    "SERVER_ERROR": "An unexpected error occurred"
+  }
+}

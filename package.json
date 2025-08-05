@@ -19,6 +19,7 @@
     "iron-session": "^8.0.4",
     "lucide-react": "^0.536.0",
     "next": "15.4.5",
+    "next-intl": "^4.3.4",
     "prisma": "^6.13.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
