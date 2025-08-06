@@ -2,6 +2,7 @@ import { SessionOptions } from "iron-session";
 
 export type SessionUser = {
   id: number;
+  name: string;
   email: string;
   permissions: string[];
 };

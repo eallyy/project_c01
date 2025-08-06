@@ -8,6 +8,9 @@
     "forgot_password": "Forgot your password?",
     "submit_button": "Login"
   },
+  "dashboard": {
+    "site_header": "Dashboard"
+  },
   "errors": {
     "LOGIN_FAILED": "Login failed. Please check your credentials and try again.",
     "SERVER_ERROR": "An unexpected error occurred"

@@ -42,6 +42,7 @@ export async function POST(req: NextRequest) {
         code: "LOGIN_SUCCESS",
         user: { 
           id: user.id,
+          name: user.name,
           email: user.email, 
           permissions: user.permissions.map((p) => p.code) 
         },
@@ -49,7 +50,7 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
 
-    const session = await getIronSession<{ user?: { id: number; email: string; permissions: string[] } }>(
+    const session = await getIronSession<{ user?: { id: number; name: string; email: string; permissions: string[] } }>(
       req,
       res,
       sessionOptions
@@ -57,6 +58,7 @@ export async function POST(req: NextRequest) {
 
     session.user = {
       id: user.id,
+      name: user.name,
       email: user.email,
       permissions: user.permissions.map((p) => p.code) 
     };
