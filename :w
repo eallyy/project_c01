@@ -1,0 +1,333 @@
+"use client"
+
+import * as React from "react"
+import {
+  ColumnDef,
+  ColumnFiltersState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  SortingState,
+  useReactTable,
+  VisibilityState,
+} from "@tanstack/react-table"
+import { ArrowUpDown, ChevronDown, TrashIcon, UserPenIcon } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter
+} from "@/components/ui/dialog"
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar"
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+      Tooltip,
+        TooltipContent,
+          TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { Input } from "@/components/ui/input"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { SessionUser } from "@/lib/session";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { useUser } from "@/contexts/UserContext";
+
+export function ChartUsersDataTable() {
+  const t = useTranslations("users");
+  const { user } = useUser();
+  const router = useRouter();
+  const [data, setData] = React.useState<SessionUser[]>([]);
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = React.useState({});
+  const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
+  const [deleteUser, setDeleteUser] = React.useState<SessionUser | null>(null);
+  const [deleting, setDeleting] = React.useState(false);
+
+  React.useEffect(() => {
+    async function fetchUsers() {
+      try {
+        const res = await fetch("/api/users");
+        console.log(res);
+        if (!res.ok) throw new Error("Failed to fetch users");
+        const json = await res.json();
+        setData(json.users || []);
+      } catch (error) {
+        console.error(error);
+      } 
+    }
+
+    fetchUsers();
+  }, []);
+
+  async function handleDelete() {
+    if (!deleteUser?.id) return;
+    try {
+        setDeleting(true);
+      const res = await fetch(`/api/users/${deleteUser?.id}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        // delete error
+        console.error("Delete failed!");
+      }
+      else {
+      setData(prev => prev.filter(u => u.id !== deleteUser?.id));
+      }
+      
+    }
+    finally {
+      setDeleting(false);
+    }
+  }
+
+  const columns: ColumnDef<SessionUser>[] = [
+      {
+        accessorKey: "id",
+        header: t("user_id"),
+        cell: ({ row }) => (
+          <div>{row.getValue("id")}</div>
+        ),
+      },
+      {
+        accessorKey: "name",
+        header: t("name"),
+        cell: ({ row }) => {
+          const name: string = row.getValue("name");
+          return (<div className="flex items-center gap-2 capitalize">
+                    <Avatar className="h-8 w-8 rounded-lg">
+                      <AvatarImage alt={row.getValue("email")} />
+                      <AvatarFallback className="rounded-lg">
+                          {name
+                            .split(" ")
+                            .slice(0, 2)
+                            .map(word => word.charAt(0).toUpperCase())
+                            .join("")}    
+                      </AvatarFallback>
+                    </Avatar>
+          {row.getValue("name")} {row.getValue("id") == user?.id ? `(${t("you")})` : null}
+          </div>)
+        },
+      },
+      {
+        accessorKey: "email",
+        header: ({ column }) => {
+          return (
+            <Button
+              variant="ghost"
+              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            >
+              {t("email")}
+              <ArrowUpDown />
+            </Button>
+          )
+        },
+        cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
+      },
+      {
+        id: "actions",
+        enableHiding: false,
+        cell: ({ row }) => {
+          return (<div className="flex justify-end gap-1">
+            <Button variant="outline" size="sm" onClick={() => router.push(`/users/edit/${row.getValue("id")}`)}>
+              <UserPenIcon />
+              {t("edit")}
+            </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                    <Button variant="destructive" 
+                        size="icon" 
+                        className="size-8" 
+                        disabled={row.getValue("id") == user?.id}
+                        onClick={() => {
+                          setDeleteUser(row.original);
+                          setOpenDeleteDialog(true);
+                        }}>
+                      <TrashIcon />
+                    </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{t("delete_user")} (ID: {row.getValue("id")})</p>
+                </TooltipContent>
+              </Tooltip>
+          </div>)
+        },
+      },
+    ]
+
+  const table = useReactTable({
+    data,
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+    },
+  })
+
+  return (
+    <div className="w-full">
+      <div className="flex items-center py-4">
+        <Input
+          placeholder={t("filter_emails")}
+          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+          onChange={(event) =>
+            table.getColumn("email")?.setFilterValue(event.target.value)
+          }
+          className="max-w-sm"
+        />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="ml-auto">
+              {t("columns")} <ChevronDown />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {table
+              .getAllColumns()
+              .filter((column) => column.getCanHide())
+              .map((column) => {
+                return (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className="capitalize"
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) =>
+                      column.toggleVisibility(!!value)
+                    }
+                  >
+                    {column.id}
+                  </DropdownMenuCheckboxItem>
+                )
+              })}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      <div className="overflow-hidden rounded-md border">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  )
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  {t("no_results")}
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      {/* Delete User Dialog */}
+      <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{t("delete_dialog.header")}</DialogTitle>
+              <DialogDescription>
+                {t("delete_dialog.description")}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="mt-2">
+              <strong>{deleteUser?.name}</strong> ({deleteUser?.email})
+            </div>
+            <DialogFooter>
+              <Button variant="destructive" onClick={handleDelete} disabled={deleting}>
+                {t("delete_dialog.submit_button")}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+      </Dialog>
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <div className="text-muted-foreground flex-1 text-sm">
+         {`${t("total_registered_users")}: ${table.getFilteredRowModel().rows.length}`}
+        </div>
+        <div className="space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            {t("previous")}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            {t("next")}
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
+

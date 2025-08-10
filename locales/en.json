@@ -11,8 +11,97 @@
   "dashboard": {
     "site_header": "Dashboard"
   },
+  "users": {
+    "site_header": "Users",
+    "user_id": "User ID",
+    "name": "Name",
+    "email": "Email",
+    "you": "You",
+    "filter_emails": "Filter emails...",
+    "columns": "Columns",
+    "no_results": "No results.",
+    "total_registered_users": "Total registered users",
+    "previous": "Previous",
+    "next": "Next",
+    "edit": "Edit",
+    "create_user": {
+      "sheet_open_button": "Create User",
+      "sheet_title": "Create New User",
+      "sheet_desc": "Add a new user to your organization. You can adjust permissions at any time.",
+      "name": "Full Name",
+      "name_placeholder": "e.g., John Doe",
+      "email": "Email Address",
+      "email_placeholder": "me@example.com",
+      "password": "Password",
+      "password_placeholder": "Set an initial password",
+      "permissions": "Permissions",
+      "permission_presets": {
+        "all_permissions": "All Permissions",
+        "guest_user": "Guest User"
+      },
+      "submit_button": "Create",
+      "form_alerts": {
+        "name_required": "Name is required",
+        "email_invalid": "Invalid email",
+        "password_min": "Password must be at least 8 characters"
+      }
+    },
+    "edit_user": {
+      "sheet_title": "Edit User",
+      "sheet_desc": "Update a user of your organization.",
+      "password_placeholder": "New password, If you want to change",
+      "submit_button": "Save"
+    },
+    "delete_user": "Delete User",
+    "delete_dialog": {
+      "header": "Delete User",
+      "description": "Are you sure you want to delete the user down below? This action cannot be undone.",
+      "submit_button": "Delete"
+    },
+    "permissions": {
+      "VIEW_DASHBOARD": {
+        "title": "View Dashboard",
+        "desc": "Allows access to the main dashboard."
+      },
+      "VIEW_USERS": {
+        "title": "View Users",
+        "desc": "Allows viewing the user list and profiles."
+      },
+      "DELETE_USER": {
+        "title": "Delete User",
+        "desc": "Allows removing user accounts from the system."
+      }
+    }
+  },
+  "403": {
+    "access_denied": "Access Denied",
+    "description": "You do not have permission to do that."
+  },
+  "sidebar": {
+    "main": {
+      "dashboard": "Dashboard",
+      "users": "Users"
+    },
+    "secondary": {
+      "settings": "Settings",
+      "get_help": "Get Help"
+    },
+    "user": {
+      "account": "Account",
+      "notifications": "Notifications",
+      "theme": {
+        "dark": "Dark Theme",
+        "light": "Light Theme"
+      },
+      "logout": "Log out"
+    }
+  },
   "errors": {
     "LOGIN_FAILED": "Login failed. Please check your credentials and try again.",
-    "SERVER_ERROR": "An unexpected error occurred"
+    "SERVER_ERROR": "An unexpected error occurred",
+    "USER_DELETED_SUCCESS": "The user has been successfully removed.",
+    "USER_DELETE_FAILED": "An unexpected error occurred while deleting the user.",
+    "CANNOT_DELETE_ROOT_USER": "The root administrator account cannot be deleted.",
+    "INVALID_USER_ID": "The provided user ID is not valid."
   }
 }

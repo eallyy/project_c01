@@ -32,5 +32,8 @@ export async function POST(req: NextRequest) {
 
   await session.save();
 
-  return Response.json({ code: "SESSION_REFRESHED", user: session.user });
+  return Response.json({ 
+      code: "SESSION_REFRESHED", 
+      user: session.user 
+  });
 }

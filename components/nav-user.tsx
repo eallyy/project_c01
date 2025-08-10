@@ -30,12 +30,14 @@ import {
 } from "@/components/ui/sidebar"
 import { useRouter } from "next/navigation";
 import { SessionUser } from "@/lib/session";
+import { useTranslations } from "next-intl";
 
 export function NavUser({
   user,
 }: {
   user: SessionUser | null
 }) {
+  const t = useTranslations("sidebar.user");
   const { isMobile } = useSidebar();
   const router = useRouter();
 
@@ -116,21 +118,21 @@ export function NavUser({
             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <IconUserCircle />
-                Account
+                {t("account")}
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <IconNotification />
-                Notifications
+                {t("notifications")}
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <IconMoon />
-                Dark Theme
+                {t("theme.dark")}
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
               <IconLogout />
-              Log out
+              {t("logout")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
