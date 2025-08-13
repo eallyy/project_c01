@@ -55,12 +55,17 @@ import {
   SheetHeader,
   SheetTitle
 } from "@/components/ui/sheet";
+import type { Prisma } from "@/lib/generated/prisma";
 import { UserForm, EditValues, CreateValues } from "@/components/user-form";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { SessionUser } from "@/lib/session";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/contexts/UserContext";
+
+type UserWithPermissions = Prisma.UserGetPayload<{
+  include: { permissions: true }
+}>;
 
 export function ChartUsersDataTable() {
   const t = useTranslations("users");
@@ -79,20 +84,20 @@ export function ChartUsersDataTable() {
   const [deleting, setDeleting] = React.useState(false);
   // User edit/create
   const [openUserDialog, setOpenUserDialog] = React.useState(false);
-  const [editUser, setEditUser] = React.useState(null);
+  const [editUser, setEditUser] = React.useState<UserWithPermissions | null>(null);
+
+  async function fetchUsers() {
+    try {
+      const res = await fetch("/api/users");
+      if (!res.ok) throw new Error("Failed to fetch users");
+      const json = await res.json();
+      setData(json.users || []);
+    } catch (error) {
+      console.error(error);
+    } 
+  }
 
   React.useEffect(() => {
-    async function fetchUsers() {
-      try {
-        const res = await fetch("/api/users");
-        if (!res.ok) throw new Error("Failed to fetch users");
-        const json = await res.json();
-        setData(json.users || []);
-      } catch (error) {
-        console.error(error);
-      } 
-    }
-
     fetchUsers();
   }, []);
 
@@ -139,8 +144,18 @@ export function ChartUsersDataTable() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
       });
-      if (!res.ok) throw new Error("Create failed");
+      const data = await res.json();
+      
+      if (!res.ok) {
+        if (data.code === "FORBIDDEN") {
+          router.push("/403");
+          return;
+        }
+
+        setAlert({ code: data.code || "USER_CREATE_FAILED", type: "error" });
+      }
       // success UI feedback
+      fetchUsers();
       setOpenUserDialog(false);
     } catch (err) {
       console.error(err);
@@ -162,8 +177,18 @@ export function ChartUsersDataTable() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error("Update failed");
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (data.code === "FORBIDDEN") {
+          router.push("/403");
+          return;
+        }
+
+        setAlert({ code: data.code || "USER_UPDATE_FAILED", type: "error" });
+      }
       // success UI feedback
+      fetchUsers();
       setOpenUserDialog(false);
       setEditUser(null);
     } catch (err) {

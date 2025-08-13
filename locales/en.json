@@ -102,6 +102,12 @@
     "USER_DELETED_SUCCESS": "The user has been successfully removed.",
     "USER_DELETE_FAILED": "An unexpected error occurred while deleting the user.",
     "CANNOT_DELETE_ROOT_USER": "The root administrator account cannot be deleted.",
-    "INVALID_USER_ID": "The provided user ID is not valid."
+    "INVALID_USER_ID": "The provided user ID is not valid.",
+    "CANNOT_UPDATE_ROOT_USER": "The root user cannot be updated.",
+    "INVALID_CONTENT_TYPE": "Invalid content type. Please send data in JSON format.",
+    "INVALID_PAYLOAD": "Invalid request payload.",
+    "EMAIL_ALREADY_EXISTS": "This email address is already in use.",
+    "USER_UPDATE_FAILED": "Failed to update the user. Please try again later.",
+    "USER_UPDATED_SUCCESS": "The user was successfully updated."
   }
 }

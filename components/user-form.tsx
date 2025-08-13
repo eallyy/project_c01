@@ -178,7 +178,7 @@ export function UserForm({ mode, defaultValues, onSubmit }: UserFormProps) {
                     type="button"
                     size="sm"
                     variant="outline"
-                    onClick={() => field.onChange(PERMISSION_PRESETS.all)}
+                    onClick={() => field.onChange(toCodeObjects(PERMISSION_PRESETS.all))}
                   >
                     {t("create_user.permission_presets.all_permissions")}
                   </Button>
@@ -187,7 +187,7 @@ export function UserForm({ mode, defaultValues, onSubmit }: UserFormProps) {
                     type="button"
                     size="sm"
                     variant="outline"
-                    onClick={() => field.onChange(PERMISSION_PRESETS.guest)}
+                    onClick={() => field.onChange(toCodeObjects(PERMISSION_PRESETS.guest))}
                   >
                     {t("create_user.permission_presets.guest_user")}
                   </Button>

@@ -47,16 +47,14 @@ export async function DELETE(
   }
 }
 
-// params'ı her iki davranışa da uyumlu şekilde al
+// Update User
 async function getParams(ctx: { params: any }) {
   return typeof ctx.params?.then === "function" ? await ctx.params : ctx.params;
 }
-
 // permissions: hem string[] hem {code}[] kabul et
 const permissionsSchema = z.preprocess((val) => {
   if (Array.isArray(val)) {
     if (val.length === 0) return [];
-    // [{code:"X"}] -> aynı bırak
     if (typeof val[0] === "object" && val[0] && "code" in (val[0] as any)) {
       return val;
     }
@@ -97,7 +95,7 @@ export async function PUT(req: NextRequest, ctx: { params: any }) {
     return NextResponse.json({ code: "INVALID_CONTENT_TYPE" }, { status: 415 });
   }
 
-  // Body parse + doğrulama
+  // Body parse + validation
   let body: z.infer<typeof payloadSchema>;
   try {
     const json = await req.json();
@@ -107,7 +105,6 @@ export async function PUT(req: NextRequest, ctx: { params: any }) {
     return NextResponse.json({ code: "INVALID_PAYLOAD" }, { status: 400 });
   }
 
-  // Güncellenecek alanlar
   const data: any = {};
   if (typeof body.name === "string") data.name = body.name;
   if (typeof body.email === "string") data.email = body.email;
